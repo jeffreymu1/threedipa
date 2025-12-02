@@ -42,3 +42,5 @@ Thumbs.db
 *.csv
 !templates/**/*.csv
 !templates/**/*.psydat
+
+*.lock
