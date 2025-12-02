@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: vizlab3d
+Version: 0.0.1
+Summary: Package to create 3D vision psychology experiments
+Author-email: Jovan Kemp <jtk194@gmail.com>
+Requires-Python: ==3.9.*
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: matplotlib>=3.9.4
+Requires-Dist: numpy>=2.0.2
+Requires-Dist: psychopy>=2025.2.1
+Requires-Dist: swig>=4.4.0
+Dynamic: license-file

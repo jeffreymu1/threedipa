@@ -1,0 +1,17 @@
+[project]
+name = "vizlab3d"
+version = "0.0.1"
+authors = [
+  { name="Jovan Kemp", email="jtk194@gmail.com" },
+]
+description = "Package to create 3D vision psychology experiments"
+readme = "README.md"
+requires-python = ">=3.10.*"
+
+
+dependencies =[
+    "matplotlib>=3.9.4",
+    "numpy>=2.0.2",
+    "psychopy>=2025.2.1",
+    "swig>=4.4.0",
+]
