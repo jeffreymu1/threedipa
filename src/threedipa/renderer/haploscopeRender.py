@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 from . import haplscope_utils
 from psychopy import visual
-from ..stimuli import make_fixation_cross
+from threedipa.stimuli.stimuli import make_fixation_cross
 
 
 class HaplscopeRender(ABC):

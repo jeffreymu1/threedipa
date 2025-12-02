@@ -1,5 +1,3 @@
-import threading
-
 from psychopy import data, core, event, gui, hardware
 from psychopy.data import ExperimentHandler, TrialHandler
 from psychopy.hardware import keyboard
@@ -7,9 +5,10 @@ from psychopy.hardware import keyboard
 
 import threedipa
 import threedipa.utils as utils
-from threedipa.renderer import monitor_settings, physical_calibration, HaplscopeRender2D
+from threedipa.renderer.haploscopeRender import HaplscopeRender2D
+from threedipa.renderer.haploscopeConfig import monitor_settings, physical_calibration
 from threedipa.procedure import OneIntervalDraw
-from threedipa.stimuli import Stimulus2DImage
+from threedipa.stimuli.stimulus2D import Stimulus2DImage
 
 # Exit protocols
 def exit_experiment(phaseTracker):

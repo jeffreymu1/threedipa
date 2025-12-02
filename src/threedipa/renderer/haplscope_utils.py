@@ -85,7 +85,7 @@ def calc_physical_calibration(
 def setup_haploscope_windows(
     monitor_names: tuple[str, str] = ("left", "right"),
     screen_indices: tuple[int, int] = (0, 1),
-    size_pix: tuple[int, int] | None = None,
+    size_pix: tuple[int, int] = [],
     fullscr: bool = True,
     color: tuple[float, float, float] = (-1, -1, -1),
     waitBlanking: bool = True,
@@ -102,7 +102,7 @@ def setup_haploscope_windows(
     screen_indices : tuple of int, optional
         Which physical screens to use (default: (0, 1))
         0 is typically the primary display, 1 is the secondary.
-    size_pix : tuple[int, int] | None, optional
+    size_pix : tuple[int, int], optional
         Window size in pixels. If None, uses full screen size.
     fullscr : bool, optional
         Whether to use fullscreen mode (default: True)
@@ -128,7 +128,11 @@ def setup_haploscope_windows(
     """
     left_monitor, right_monitor = monitor_names
     left_screen, right_screen = screen_indices
-    
+
+    if size_pix == []:
+        size_pix = (800, 600)
+        fullscr = False
+        print("Using default size (800x600) for non-fullscreen mode")
     # Create left window
     left_window = visual.Window(
         size=size_pix,
@@ -156,9 +160,9 @@ def setup_haploscope_windows(
 
 def update_window_image(
     window: visual.Window,
-    image: str | Path | np.ndarray,
+    image: str ,
     position: tuple[float, float] = (0, 0),
-    size: tuple[float, float] | None = None,
+    size: tuple[float, float] = [],
     flip: bool = True
 ) -> visual.ImageStim:
     """
@@ -172,7 +176,7 @@ def update_window_image(
         Path to image file or numpy array of image data
     position : tuple[float, float], optional
         (x, y) position in window coordinates (default: (0, 0))
-    size : tuple[float, float] | None, optional
+    size : tuple[float, float], optional
         (width, height) size in window coordinates. If None, uses image size.
     flip : bool, optional
         Whether to flip the window after drawing (default: True)
@@ -208,12 +212,12 @@ def update_window_image(
 def update_both_windows(
     left_window: visual.Window,
     right_window: visual.Window,
-    left_image: str | Path | np.ndarray,
-    right_image: str | Path | np.ndarray,
+    left_image: str,
+    right_image: str,
     left_position: tuple[float, float] = (0, 0),
     right_position: tuple[float, float] = (0, 0),
-    left_size: tuple[float, float] | None = None,
-    right_size: tuple[float, float] | None = None,
+    left_size: tuple[float, float] = [],
+    right_size: tuple[float, float] = [],
     sync_flip: bool = True
 ) -> tuple[visual.ImageStim, visual.ImageStim]:
     """
@@ -225,18 +229,18 @@ def update_both_windows(
         Left monitor window
     right_window : visual.Window
         Right monitor window
-    left_image : str, Path, or numpy.ndarray
+    left_image : str
         Image to display on left window
-    right_image : str, Path, or numpy.ndarray
+    right_image : str
         Image to display on right window
     left_position : tuple of float, optional
         Position for left image (default: (0, 0))
     right_position : tuple of float, optional
         Position for right image (default: (0, 0))
-    left_size : tuple[float, float] | None, optional
-        Size for left image (default: None, uses image size)
-    right_size : tuple of float or None, optional
-        Size for right image (default: None, uses image size)
+    left_size : tuple[float, float] = [], optional
+        Size for left image (default: [], uses image size)
+    right_size : tuple of float = [], optional
+        Size for right image (default: [], uses image size)
     sync_flip : bool, optional
         Whether to synchronize the flip of both windows (default: True)
         If True, draws both then flips both. If False, flips each as drawn.
