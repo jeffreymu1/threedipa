@@ -1,0 +1,5 @@
+matplotlib>=3.9.4
+numpy>=2.0.2
+psychopy>=2025.2.1
+swig>=4.4.0
+

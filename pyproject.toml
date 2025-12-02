@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "vizlab3d"
 version = "0.0.1"
@@ -6,12 +10,16 @@ authors = [
 ]
 description = "Package to create 3D vision psychology experiments"
 readme = "README.md"
-requires-python = ">=3.10.*"
+requires-python = ">=3.10"
+license = {text = "See LICENSE file"}
 
-
-dependencies =[
+dependencies = [
     "matplotlib>=3.9.4",
     "numpy>=2.0.2",
     "psychopy>=2025.2.1",
     "swig>=4.4.0",
 ]
+
+[tool.setuptools]
+packages = ["threedipa", "threedipa.renderer", "threedipa.stimuli"]
+package-dir = {"" = "src"}

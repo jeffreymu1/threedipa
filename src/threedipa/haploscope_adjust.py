@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import math
 from typing import Dict, Tuple
-import vizlab3d.config as config
+from . import config
 
 def calc_display_positions(focal_distance: float) -> Tuple[float, float]:
     """Return the left/right display carriage positions for ``focal_distance``.
