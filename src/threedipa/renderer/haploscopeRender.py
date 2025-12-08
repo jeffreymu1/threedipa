@@ -100,6 +100,59 @@ class HaplscopeRender2D(HaplscopeRender):
         self.windows[0].close()
         self.windows[1].close()
 
+class SingleScreenRender2D(HaplscopeRender):
+    """Render the stimulus on the haploscope."""
+
+    def __init__(
+        self,
+        physical_calibration,
+        screen_config,
+        debug_mode,
+    ):
+        self.physical_calibration = physical_calibration
+        self.config = screen_config
+        self.debug_mode = debug_mode
+        self.window = haplscope_utils.setup_single_window(
+            size_pix=self.config["size_pix"],
+            fullscr=self.config["full_screen"],
+        ) if not self.debug_mode else haplscope_utils.setup_single_window(
+            size_pix=[800,600],
+            fullscr=False,
+        )
+
+    def draw_fixation_cross(
+        self,
+        size: tuple[float, float] = (1.0, 1.0),
+        color: str = 'white',
+        pos : tuple[float, float] = (0, 0)
+    ):
+        """Draw the fixation cross on the windows."""
+        l_fixation, _ = make_fixation_cross(
+            self.window, size, color, pos)
+        l_fixation[0].draw()  # vertical line
+        l_fixation[1].draw()  # horizontal line
+
+    def draw_image_stimulus(
+        self, stimulus, kwargs: dict = {}
+    ) -> tuple[visual.ImageStim, visual.ImageStim]:
+        """Draw the image stimulus on the windows."""
+
+        visual.ImageStim(
+            self.window,
+            image=str(stimulus.left_image),
+            units=self.window.units,
+            **kwargs
+        ).draw()
+        
+    def render_screen(
+        self
+    ):
+        self.window.flip()
+
+    def close_windows(self):
+        """Close the windows."""
+        self.window.close()
+
 
 class HaplscopeRender3D(HaplscopeRender):
     """Render the stimulus on the haploscope."""
