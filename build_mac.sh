@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# macOS bash script for uv build and sync
-# This script can be run in Terminal on macOS
+# Bash script to create virtual environment and build threedipa package
 
 set -e  # Exit on error
 
@@ -28,21 +27,23 @@ echo ""
 
 read -p "Do you want to create threedipa virtual environment? (y/n): " -n 1 -r
 echo ""
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    # Run uv build
-    echo "=== Running uv build ==="
-    uv build
-    echo ""
+if [ ! -e .venv]; then
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        # Run uv build
+        echo "=== Running uv build ==="
+        uv build
+        echo ""
 
-    # Run uv sync
-    echo "=== Running uv sync ==="
-    uv sync
-    echo ""
+        # Run uv sync
+        echo "=== Running uv sync ==="
+        uv sync
+        echo ""
 
-    echo "=== Build and sync complete! ==="
-else
-    echo "Please create threedipa virtual environment manually: uv venv"
-    exit 1
+        echo "=== Build and sync complete! ==="
+    else
+        echo "Please create threedipa virtual environment manually: uv venv"
+        exit 1
+    fi
 fi
 
 # Open venv and install package in editable mode

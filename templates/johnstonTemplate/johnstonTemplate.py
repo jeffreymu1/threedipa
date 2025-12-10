@@ -115,7 +115,7 @@ def main():
     renderer.render_screen()
     kb.waitKeys(keyList=['return'], waitRelease=True)
     
-    # 9. Trial loop to run each trial
+    # 9. Experiment loop to run each trial
     # Iterate through the TrialHandler
     for currentTrial in trials:
         # Break trial loop if the experiment should be ended
@@ -132,6 +132,8 @@ def main():
         
         phaseTracker.set_experiment_phase(utils.ExperimentPhase.TRIAL)
         trial_time.reset()
+        
+        # Trial loop to run each frame of the trial
         while phaseTracker.get_experiment_phase() == utils.ExperimentPhase.TRIAL:
             # Control the timing of the trial
             # This controls when the stimulus is drawn and when the response is expected
