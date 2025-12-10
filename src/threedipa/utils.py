@@ -1,6 +1,9 @@
 from itertools import product
 import enum
-
+import numpy as np
+#------------------------------------------------------------------------------
+# Experiment Control Variables
+#------------------------------------------------------------------------------
 class ExperimentPhase(enum.Enum):
     """
     Enum for the experiment phases.
@@ -64,7 +67,9 @@ class PhaseTracker():
     def set_stimulus_phase(self, stimulusPhase : StimulusPhase):
         self.stimulusPhase = stimulusPhase
 
-
+#------------------------------------------------------------------------------
+# Parameter Loading Functions
+#------------------------------------------------------------------------------
 
 def parse_parameters_file(filepath):
     """
@@ -226,3 +231,34 @@ def _convert_value(value_str):
     
     # Return as string
     return value_str
+
+#------------------------------------------------------------------------------
+# Geometric Conversion Functions
+#------------------------------------------------------------------------------
+def physical_width_from_visual_degree(
+    visual_degree: float,
+    distance: float,
+    ) -> float:
+    return np.tan(visual_degree / 2) * distance * 2
+
+def degree_from_width_cm(
+    width_cm: float,
+    distance: float,
+    ) -> float:
+    return np.arctan(width_cm / (2 * distance)) * 2
+
+def pixels_by_visual_degree(
+    width_physical: float,
+    distance: float,
+    pixel_by_cm: float,
+    ) -> float:
+    visual_degree = degree_from_width_cm(width_physical, distance)
+    cm_by_degree = width_physical / visual_degree
+    return cm_by_degree * pixel_by_cm
+
+def visual_degree_to_pixel(
+    visual_degree: float,
+    pixel_per_degree: float
+    ) -> float:
+    # Convert visual degree to monitor pixels
+    return visual_degree * pixel_per_degree
