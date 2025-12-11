@@ -65,6 +65,7 @@ def main():
     trialList = utils.createFactorialTrialList(parameters['factors'])
     repetitions = parameters['parameters']['Repetitions']
     fixationDistance = parameters['parameters']['FixationDistance']
+    stimulusVisualAngle = parameters['parameters']['VisualAngle']
     
     # 4. Create ExperimentHandler and TrialHandler
     thisExp = ExperimentHandler(
@@ -129,6 +130,7 @@ def main():
         stimulusDepth = currentTrial['Depth']
         stimulusHeight = currentTrial['halfHeight']
         stimulus = load_stimulus(stimulusDepth, stimulusHeight, exp_dir)
+        stimulus.visual_size_degrees = (stimulusVisualAngle, stimulusVisualAngle)
         
         phaseTracker.set_experiment_phase(utils.ExperimentPhase.TRIAL)
         trial_time.reset()
@@ -169,7 +171,6 @@ def main():
 
     # 8. Save and close
     thisExp.saveAsWideText(data_file_name + '.csv')
-    thisExp.saveAsPickle(data_file_name)
     renderer.close_windows()
     core.quit()
         

@@ -115,7 +115,7 @@ class HaplscopeRender2D(HaplscopeRender):
             size_degrees = (self.fixation_cross_degrees, self.fixation_cross_degrees)
         horizontal_in_pixels = size_degrees[0] * self.pixel_per_degree
         vertical_in_pixels = size_degrees[1] * self.pixel_per_degree
-        print(f"Drawing fixation cross of size (pixels): {horizontal_in_pixels}, {vertical_in_pixels}")
+
         size_pixels = (horizontal_in_pixels, vertical_in_pixels)
         l_fixation, r_fixation = make_fixation_cross(
             self.windows, size_pixels, color, pos)
@@ -129,19 +129,26 @@ class HaplscopeRender2D(HaplscopeRender):
 
     def draw_image_stimulus(
         self, stimulus, kwargs: dict = {}
-    ) -> tuple[visual.ImageStim, visual.ImageStim]:
+    ):
         """Draw the image stimulus on the windows."""
-
+        if stimulus.visual_size_degrees is None:
+            raise ValueError("Visual size in degrees must be set for the stimulus.")
+        stimulus_size_pixels = (
+            stimulus.visual_size_degrees[0] * self.pixel_per_degree,
+            stimulus.visual_size_degrees[1] * self.pixel_per_degree
+        )
         stim_left = visual.ImageStim(
             self.windows[0],
             image=str(stimulus.left_image),
-            units=self.windows[0].units,
+            units="pix",
+            size=stimulus_size_pixels,
             **kwargs
         ).draw()
         stim_right = visual.ImageStim(
             self.windows[1],
             image=str(stimulus.right_image),
-            units=self.windows[1].units,
+            units="pix",
+            size=stimulus_size_pixels,
             **kwargs
         ).draw()
         

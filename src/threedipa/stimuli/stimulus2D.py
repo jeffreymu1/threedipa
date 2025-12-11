@@ -40,8 +40,9 @@ class Stimulus2DImage(Stimulus2D):
     
     def __init__(
         self,
-        left_image_path = None,
-        right_image_path = None
+        left_image_path: str = None,
+        right_image_path: str = None,
+        visual_size_degrees: tuple[float, float] = None,
     ):
         """Initialize the StimulusImage.
         
@@ -51,12 +52,14 @@ class Stimulus2DImage(Stimulus2D):
             Path to left eye image file or numpy array. If None, must be set later.
         right_image : str, Path, np.ndarray, or None, optional
             Path to right eye image file or numpy array. If None, must be set later.
+        visual_size_degrees : tuple[float, float], optional
+            Visual size of the stimulus in degrees. If None, must be set later.
         """
         self.left_image_path = left_image_path
         self.right_image_path = right_image_path
         self.left_image = None
         self.right_image = None
-        
+        self.visual_size_degrees = visual_size_degrees
         # Load images if provided
         if left_image_path is not None and right_image_path is not None:
             self.load_stimulus()
