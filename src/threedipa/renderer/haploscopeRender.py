@@ -151,7 +151,14 @@ class HaplscopeRender2D(HaplscopeRender):
             size=stimulus_size_pixels,
             **kwargs
         ).draw()
-        
+    
+    def draw_probe(
+        self, probe_stimulus
+    ):
+        """Draw the probe stimulus on the windows."""
+        probe_stimulus.draw(self.windows[0])
+        probe_stimulus.draw(self.windows[1])
+
     def render_screen(
         self
     ):

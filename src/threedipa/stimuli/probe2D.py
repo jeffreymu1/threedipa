@@ -1,0 +1,127 @@
+from abc import ABC, abstractmethod
+from psychopy import visual
+import numpy as np
+
+class Stimulus2D(ABC):
+    """Abstract base class for 2D probes for measuring depth perception"""
+    
+    def __init__(self, win):
+        self.win = win
+    
+    @abstractmethod
+    def draw(self):
+        """Draw the stimulus"""
+        pass
+    
+    @abstractmethod
+    def setPos(self, pos):
+        """Set position of the stimulus"""
+        pass
+
+
+class ShapeOutlineProbe(Stimulus2D):
+    """Draws a 2D shape probe defined by a function y=f(x)
+    
+        Parameters
+        ----------
+        win : psychopy.visual.Window
+        probe_func : function
+            A function that takes a argument x and magnitude and returns y
+        magnitude : float
+            The magnitude of the probe
+        x_range : tuple
+            The beginning and end of the probe (min, max).
+            Average should be 0 to ensure translation moves center.
+        segments : int
+            Number of segments to use to draw the probe. LArger numbers give smoother shapes.
+        line_width_pix : int
+            Width of the line in pixels
+        rotate_90 : bool
+            Whether to rotate the shape by 90 degrees
+        color : str or tuple
+            Color of the shape outline
+    """
+    
+    def __init__(
+            self,
+            probe_func: callable,
+            magnitude: float = 0,
+            win: visual.Window = None,
+            x_range: tuple[int, int] = (-1, 1),
+            segments: int = 100,
+            line_width_pix: int = 5,
+            rotate_90: bool = False,
+            color: str = 'white'
+            ):
+        self.probe_func = probe_func
+        self.magnitude = magnitude
+        self.segments = segments
+        self.lineWidth = line_width_pix
+        self.rotate_90 = rotate_90
+        self.color = color
+        self.pos = [0, 0]
+        self.x_vals = np.linspace(x_range[0], x_range[1], segments)
+        self.win = win
+    
+    def draw(
+            self,
+            win: visual.Window = None
+            ):
+        if win is None:
+            win = self.win
+            if win is None:
+                raise ValueError("A psychopy.visual.Window must be provided to draw the stimulus.")
+        # Initialize previous coordinate
+        previous_coordinate = (np.array([-1, 0]) if not self.rotate_90 else np.array([0, -1])) + self.pos
+        for x_coors in self.x_vals:
+            y_coor = self.probe_func(x_coors, self.magnitude)
+            coordinates = (
+                np.array([x_coors, y_coor]) if not self.rotate_90 else np.array([y_coor, x_coors])
+                ) + self.pos
+            visual.Line(
+                win=win,
+                start=previous_coordinate,
+                end=coordinates,
+                lineWidth=self.lineWidth,
+                lineColor=self.color,
+                pos=self.pos
+            ).draw()
+    
+    def setPos(self, pos):
+        self.pos = pos
+        self.line.pos = pos
+    
+    def setMagnitude(self, magnitude):
+        self.magnitude = magnitude
+
+
+class DotStimulus(Stimulus2D):
+    """Draws 2D dot(s) on the screen"""
+    
+    def __init__(self, win, pos=None, size=0.1, color='white', num_dots=1):
+        super().__init__(win)
+        self.size = size
+        self.color = color
+        self.num_dots = num_dots
+        self.pos = pos if pos is not None else [0, 0]
+        
+        if num_dots == 1:
+            self.dots = visual.Circle(win, radius=size, fillColor=color, lineColor=color)
+        else:
+            self.dots = [visual.Circle(win, radius=size, fillColor=color, lineColor=color) 
+                        for _ in range(num_dots)]
+    
+    def draw(self):
+        if self.num_dots == 1:
+            self.dots.draw()
+        else:
+            for dot in self.dots:
+                dot.draw()
+    
+    def setPos(self, pos):
+        self.pos = pos
+        if self.num_dots == 1:
+            self.dots.pos = pos
+        else:
+            for i, dot in enumerate(self.dots):
+                dot.pos = pos[i] if isinstance(pos[0], (list, tuple)) else pos

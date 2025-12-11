@@ -107,7 +107,7 @@ def main():
     # 7. Calibrate the physical haploscope
     renderer.draw_physical_calibration()
     renderer.render_screen()
-    kb.waitKeys(keyList=['return'], waitRelease=True)
+    kb.waitKeys(keyList=['return', ], waitRelease=True)
     
     # 8. Give instructions to the participant
     instructions_text = ("Press 3 if the stimulus is stretched and 6 if it is squashed."
@@ -147,7 +147,7 @@ def main():
             if phaseTracker.get_response_phase() == utils.ResponsePhase.WAIT_FOR_RESPONSE:
                 kb.clock.reset()
                 kb.clearEvents()
-                response_key = kb.waitKeys(keyList=['3', '6', 'escape'], waitRelease=False)
+                response_key = kb.waitKeys(keyList=['num_3', '3', '6', 'num_6', 'escape'], waitRelease=False)
                 
                 if response_key:
                     rt = kb.clock.getTime()
@@ -161,9 +161,16 @@ def main():
         else:
             phaseTracker.set_experiment_phase(utils.ExperimentPhase.POST_TRIAL)
         
+
+        # Remove 'num_' prefix from key name if input is from numpad
+        response_name = response_key[0].name
+        if response_name.startswith('num_'):
+            response_name = response_name[4:]  # Remove first 4 characters ('num_')
+
+
         # Store data and end the entry line
         trials.addData('stimulus_id', getattr(stimulus, 'stimulus_id', ''))
-        trials.addData('response_key', response_key[0].name)
+        trials.addData('response_key', response_name)
         trials.addData('rt_s', rt)
         
         # Move to the next line of the experimentHandler data management
@@ -174,7 +181,5 @@ def main():
     renderer.close_windows()
     core.quit()
         
-    
-
 if __name__ == "__main__":
     main()
