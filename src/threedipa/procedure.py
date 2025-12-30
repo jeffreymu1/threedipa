@@ -74,7 +74,7 @@ def stimulusAdjustmentDraw(
     elif(stimulusPhase == utils.StimulusPhase.STIMULUS):
         stimulus.update_stimulus()
         renderer.draw_image_stimulus(stimulus)
-        renderer.draw_image_probe(probe)
+        renderer.draw_probe(probe)
         renderer.render_screen()
     # Draw a blank screen
     elif(stimulusPhase == utils.StimulusPhase.NONE):

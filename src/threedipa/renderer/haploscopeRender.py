@@ -53,12 +53,12 @@ class HaplscopeRender2D(HaplscopeRender):
             size_pix=[800,600],
             fullscr=False,
         )
-        self.pixel_by_cm = self.config["size_pix"][0] / self.config["size_cm"][0]
+        self.pixel_by_cm_density = self.config["size_pix"][0] / self.config["size_cm"][0]
 
         self.pixel_per_degree = utils.pixels_by_visual_degree(
             self.config["size_cm"][0],
             self.fixation_distance,
-            self.pixel_by_cm
+            self.pixel_by_cm_density
         )
 
     def draw_physical_calibration(self):
@@ -152,10 +152,31 @@ class HaplscopeRender2D(HaplscopeRender):
             **kwargs
         ).draw()
     
+    def convert_visual_angle_to_pixels(self, angle):
+        """ Convert visual angle in degrees to pixels on the screen """
+        return self.pixel_per_degree * angle
+    
+    def convert_centimeters_to_pixels(self, size_cm):
+        """ Convert physical size to pixels on the screen """
+        size_degrees = utils.degree_from_width_cm(size_cm, self.fixation_distance)
+        return self.convert_visual_angle_to_pixels(size_degrees)
+
+    
     def draw_probe(
         self, probe_stimulus
     ):
         """Draw the probe stimulus on the windows."""
+        # Update the amount of pixel movement.
+        magnitude = probe_stimulus.getMagnitude()
+        if probe_stimulus.units == "centimeters":
+            magnitude_pixels = self.convert_centimeters_to_pixels(magnitude)
+            probe_stimulus.setMagnitudePixels(magnitude_pixels)
+        elif probe_stimulus.units == "degrees":
+            magnitude_pixels = self.convert_visual_angle_to_pixels(magnitude)
+            probe_stimulus.setMagnitudePixels(magnitude_pixels)
+        elif probe_stimulus.units == "pixels":
+            magnitude_pixels = magnitude
+            probe_stimulus.setMagnitudePixels(magnitude_pixels)
         probe_stimulus.draw(self.windows[0])
         probe_stimulus.draw(self.windows[1])
 
@@ -185,7 +206,7 @@ class SingleScreenRender2D(HaplscopeRender):
         self.window = renderer_utils.setup_single_window(
             size_pix=self.config["size_pix"],
             fullscr=self.config["full_screen"],
-        ) if not self.debug_mode else haplscope_utils.setup_single_window(
+        ) if not self.debug_mode else renderer_utils.setup_single_window(
             size_pix=[800,600],
             fullscr=False,
         )

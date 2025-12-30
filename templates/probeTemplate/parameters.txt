@@ -1,0 +1,23 @@
+# Example Parameter file
+# Experiment parameters
+# Use capitalization to avoid the key lowercase letters f and s
+Debug: 1
+VisualAngle: 4.016 # In degrees. See Johnston1991 for the 3 visual angles
+Repetitions: 10
+FixationDistance: 50 # In centimeters
+StimulusDuration: 1
+FixationDuration: .5
+
+# Probe Parameters
+ProbeLength: 2  # Length of the probe in degrees of visual angle
+ProbeIncrements: .5 # In centimeters
+ProbeYPosition: 2 # In Degrees
+
+# Experiment Factors
+fDepth: 10, 30, 50
+fhalfHeight: 2.5, 3.75, 5.0, 6.25, 7.5
+
+# Experiment adaptive staircase parameters
+
+
+

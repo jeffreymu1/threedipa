@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from psychopy import visual
 import numpy as np
 
-class Stimulus2D(ABC):
+class Probe2D(ABC):
     """Abstract base class for 2D probes for measuring depth perception"""
     
     def __init__(self, win):
@@ -19,7 +19,7 @@ class Stimulus2D(ABC):
         pass
 
 
-class ShapeOutlineProbe(Stimulus2D):
+class ShapeOutlineProbe(Probe2D):
     """Draws a 2D shape probe defined by a function y=f(x)
     
         Parameters
@@ -34,12 +34,16 @@ class ShapeOutlineProbe(Stimulus2D):
             Average should be 0 to ensure translation moves center.
         segments : int
             Number of segments to use to draw the probe. LArger numbers give smoother shapes.
+        postion : list[int, int]
+            Position on the screen in pixels
         line_width_pix : int
             Width of the line in pixels
         rotate_90 : bool
             Whether to rotate the shape by 90 degrees
         color : str or tuple
             Color of the shape outline
+        units : str
+            Defines the units stored in magnitude. Can be centimeters, pixels, or degrees
     """
     
     def __init__(
@@ -49,20 +53,37 @@ class ShapeOutlineProbe(Stimulus2D):
             win: visual.Window = None,
             x_range: tuple[int, int] = (-1, 1),
             segments: int = 100,
+            position: list[int, int] = [0, 0],
             line_width_pix: int = 5,
             rotate_90: bool = False,
-            color: str = 'white'
+            color: str = 'white',
+            units: str = "pixels"
             ):
         self.probe_func = probe_func
         self.magnitude = magnitude
+        self.magnitude_pixels = magnitude if units == "pixels" else None
         self.segments = segments
         self.lineWidth = line_width_pix
         self.rotate_90 = rotate_90
         self.color = color
-        self.pos = [0, 0]
+        self.pos = position
         self.x_vals = np.linspace(x_range[0], x_range[1], segments)
+        self.units = units
         self.win = win
+
+    def applyProbeFunction(self, x):
+        return self.probe_func(x, self.magnitude_pixels)
     
+    def setMagnitudePixels(self, x_pixels):
+        self.magnitude_pixels = x_pixels
+        return
+    
+    def getMagnitude(self):
+        return (self.magnitude)
+    
+    def getMagnitudePixels(self):
+        return (self.magnitude_pixels)
+
     def draw(
             self,
             win: visual.Window = None
@@ -71,13 +92,22 @@ class ShapeOutlineProbe(Stimulus2D):
             win = self.win
             if win is None:
                 raise ValueError("A psychopy.visual.Window must be provided to draw the stimulus.")
+        x_coors = self.x_vals.copy()
         # Initialize previous coordinate
-        previous_coordinate = (np.array([-1, 0]) if not self.rotate_90 else np.array([0, -1])) + self.pos
-        for x_coors in self.x_vals:
-            y_coor = self.probe_func(x_coors, self.magnitude)
+        first_x = min(x_coors)
+        first_y = self.applyProbeFunction(first_x)
+        previous_coordinate = (np.array([first_x, first_y]) if not self.rotate_90 else np.array([first_y, first_x])) + self.pos
+
+        # Remove previous coordinate
+        np.delete(x_coors, 0)
+        
+        # Cycle through the 
+        for x_coor in x_coors:
+            y_coor = self.applyProbeFunction(x_coor)
             coordinates = (
-                np.array([x_coors, y_coor]) if not self.rotate_90 else np.array([y_coor, x_coors])
+                np.array([x_coor, y_coor]) if not self.rotate_90 else np.array([y_coor, x_coor])
                 ) + self.pos
+
             visual.Line(
                 win=win,
                 start=previous_coordinate,
@@ -86,6 +116,7 @@ class ShapeOutlineProbe(Stimulus2D):
                 lineColor=self.color,
                 pos=self.pos
             ).draw()
+            previous_coordinate = coordinates
     
     def setPos(self, pos):
         self.pos = pos
@@ -95,7 +126,7 @@ class ShapeOutlineProbe(Stimulus2D):
         self.magnitude = magnitude
 
 
-class DotStimulus(Stimulus2D):
+class DotStimulus(Probe2D):
     """Draws 2D dot(s) on the screen"""
     
     def __init__(self, win, pos=None, size=0.1, color='white', num_dots=1):

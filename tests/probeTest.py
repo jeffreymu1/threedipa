@@ -19,12 +19,12 @@ sys.path.insert(0, str(repo_root / 'src'))
 from threedipa.stimuli.probe2D import ShapeOutlineProbe
 
 
-def semiellipse(x: float, magnitude: float) -> float:
+def parabolaProbe(x: float, magnitude: float) -> float:
     """
-    Semiellipse function where magnitude controls stretch/compression.
+    Function that controls the stretch/compression of parabola probe.
     """
-    # Semiellipse: y = sqrt(1 - x^2) * magnitude
-    y = np.sqrt(max(0, 1)) * magnitude
+    radius = 50 # in pixels, change with probe length
+    y = (2*np.sqrt(x**2) / radius)**2 * magnitude
     return y
 
 
@@ -45,18 +45,18 @@ def main():
     )
     
     # Initialize magnitude
-    magnitude = 50
+    magnitude = 20
     magnitude_step = 5
     
-    # Create probe with semiellipse function
+    # Create probe with parabolaProbe function
     probe = ShapeOutlineProbe(
-        probe_func=semiellipse,
+        probe_func=parabolaProbe,
         magnitude=magnitude,
         win=win,
-        x_range=(-1, 1),
+        x_range=(-50, 50),
         segments=100,
         line_width_pix=3,
-        rotate_90=False,
+        rotate_90=True,
         color='white'
     )
     
@@ -92,18 +92,20 @@ def main():
     
     while running:
         # Check for key presses
-        keys = kb.getKeys(['num_3', 'num_6', 'escape'], waitRelease=False)
+        keys = kb.getKeys(['a', 's', 'escape'], waitRelease=False)
         
         for key in keys:
             if key.name == 'escape':
                 running = False
-            elif key.name == 'num_3':
+            elif key.name == 'a':
                 magnitude = max(0, magnitude - magnitude_step)
                 probe.setMagnitude(magnitude)
+                probe.setMagnitudePixels(magnitude)
                 print(f"Magnitude: {magnitude}")
-            elif key.name == 'num_6':
+            elif key.name == 's':
                 magnitude += magnitude_step
                 probe.setMagnitude(magnitude)
+                probe.setMagnitudePixels(magnitude)
                 print(f"Magnitude: {magnitude}")
         
         # Update magnitude text
