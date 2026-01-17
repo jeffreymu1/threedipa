@@ -1,0 +1,16 @@
+name: threedipa
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - numpy=1.26.4
+  - pytables=3.9.1
+  - hdf5
+  - swig
+  - scipy
+  - pip
+  - pip:
+      - matplotlib>=3.9.4
+      - psychopy>=2025.2.1
+      - -e .1
