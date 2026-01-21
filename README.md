@@ -15,6 +15,20 @@ A Python package for creating 3D vision psychology experiments using PsychoPy an
 2. Close and reopen powershell and run `.\build_pc.ps1` to install dependencies and the threedipa package and open the threedipa env
 3. Run `python .\templates\johnstonTemplate\johnstonTemplate.py` 
 
+### Mac:
+Create the environment 
+```
+conda env create -f environment.yml
+```
+
+Activate the environment 
+```
+conda activate threedipa
+```
+Run 
+```
+python .\templates\johnstonTemplate\johnstonTemplate.py
+```
 
 ## Documentation
 
