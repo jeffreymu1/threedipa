@@ -11,13 +11,13 @@ from psychopy.hardware import keyboard
 
 # vizlab3D libraries 
 from psychopy.data import ExperimentHandler
-from .renderer.haploscopeRender import HaplscopeRender
+from .renderer.renderers import ExperimentRenderer
 from .stimuli.stimulus2D import Stimulus2D
 from . import utils
 
 
 def OneIntervalDraw(
-    renderer: HaplscopeRender,
+    renderer: ExperimentRenderer,
     stimulus: Stimulus2D,
     stimulusPhase: utils.StimulusPhase
 ):
@@ -36,7 +36,7 @@ def OneIntervalDraw(
         renderer.render_screen()
     
 def TwoIntervalDraw(
-    renderer: HaplscopeRender,
+    renderer: ExperimentRenderer,
     stimulus1: Stimulus2D,
     stimulus2: Stimulus2D,
     stimulusPhase: utils.StimulusPhase
@@ -61,7 +61,7 @@ def TwoIntervalDraw(
     return
 
 def stimulusAdjustmentDraw(
-    renderer: HaplscopeRender,
+    renderer: ExperimentRenderer,
     stimulus: Stimulus2D,
     probe: Probe2D,
     stimulusPhase: utils.StimulusPhase

@@ -11,6 +11,7 @@ __all__ = [
     "HaplscopeRender",
     "HaplscopeRender2D",
     "HaplscopeRender3D",
+    "ShutterRenderer3D",
     "physical_calibration",
     "monitor_settings",
 

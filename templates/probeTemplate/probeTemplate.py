@@ -6,7 +6,7 @@ import numpy as np
 
 # Class built functions
 import threedipa.utils as utils
-from threedipa.renderer.haploscopeRender import HaplscopeRender2D
+from threedipa.renderer.renderers import HaplscopeRender2D
 from threedipa.renderer.haploscopeConfig import monitor_settings, physical_calibration
 from threedipa.procedure import stimulusAdjustmentDraw
 from threedipa.stimuli.stimulus2D import Stimulus2DImage

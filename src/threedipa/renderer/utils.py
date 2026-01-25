@@ -168,6 +168,7 @@ def setup_single_window(
     fullscr: bool = True,
     color: tuple[float, float, float] = (-1, -1, -1),
     waitBlanking: bool = True,
+    stereo = False,
     **kwargs
 ) -> visual.Window:
     """Set up a single PsychoPy window on a monitor for haploscope display."""
@@ -182,6 +183,7 @@ def setup_single_window(
         monitor=monitor_name,
         color=color,
         waitBlanking=waitBlanking,
+        stereo=stereo,
         **kwargs
     )
 

@@ -6,8 +6,8 @@ from psychopy import core
 import psychopy.visual as visual
 
 
-from vizlab3d.renderer.haploscopeRender2D import HaplscopeRender2D
-from vizlab3d.stimulus.stimulus2D import StimulusImage
+from threedipa.renderer.renderers import ExperimentRenderer2D
+from threedipa.stimuli.stimulus2D import StimulusImage
 
 
 def main():

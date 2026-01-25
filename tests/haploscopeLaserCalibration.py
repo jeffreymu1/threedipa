@@ -1,13 +1,13 @@
 from psychopy.hardware import keyboard
 
-from threedipa.renderer.haploscopeRender import HaplscopeRender2D
+from threedipa.renderer.renderers import ExperimentRenderer2D
 from threedipa.renderer.haploscopeConfig import monitor_settings, physical_calibration
 
 def main():
     
     fixation_distance = 50  # cm
     iod = 64
-    renderer = HaplscopeRender2D(fixation_distance, iod, physical_calibration, monitor_settings, 0)
+    renderer = ExperimentRenderer2D(fixation_distance, iod, physical_calibration, monitor_settings, 0)
     kb = keyboard.Keyboard()
 
     while True:
