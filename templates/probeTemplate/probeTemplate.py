@@ -1,3 +1,5 @@
+import os
+
 # Third-party libraries
 from psychopy import core, gui
 from psychopy.data import ExperimentHandler, TrialHandler
@@ -61,6 +63,10 @@ def main():
     parameters = utils.parse_parameters_file(exp_dir + 'parameters.txt')
     debug_mode = parameters['parameters']['Debug']
 
+        # Create data directory if it doesn't exist
+    data_dir = exp_dir + '/data'
+    os.makedirs(data_dir, exist_ok=True)
+
     # 3. Create trial list (all combinations of factors)
     trialList = utils.createFactorialTrialList(parameters['factors'])
     repetitions = parameters['parameters']['Repetitions']
@@ -78,7 +84,6 @@ def main():
         version='1.0',
         extraInfo=info,
         runtimeInfo=None,
-        dataFileName=data_file_name
     )
 
     trials = TrialHandler(
