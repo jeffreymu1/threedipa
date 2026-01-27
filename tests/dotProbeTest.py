@@ -16,7 +16,7 @@ from psychopy.hardware import keyboard
 repo_root = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(repo_root / 'src'))
 
-from threedipa.stimuli.probe2D import ShapeOutlineProbe
+from threedipa.stimuli.probe2D import DotProbe
 
 
 def parabolaProbe(x: float, magnitude: float) -> float:
@@ -45,25 +45,17 @@ def main():
     )
     
     # Initialize magnitude
-    magnitude = 20
-    magnitude_step = 5
+    vertical_position = 0
+    vertical_position_step = 5
     
     # Create probe with parabolaProbe function
-    probe = ShapeOutlineProbe(
-        probe_func=parabolaProbe,
-        magnitude=magnitude,
-        win=win,
-        x_range=(-50, 50),
-        segments=100,
-        line_width_pix=3,
-        rotate_90=True,
-        color='white'
-    )
+
+    probe = DotProbe(win=win, pos=[0, 0], size=2, color='white', num_dots=1)
     
     # Create text to display current magnitude
     magnitude_text = visual.TextStim(
         win=win,
-        text=f"Magnitude: {magnitude}",
+        text=f"Vertical Position: {vertical_position}",
         pos=(0, -300),
         height=20,
         color='white'
@@ -92,27 +84,23 @@ def main():
     
     while running:
         # Check for key presses
-        keys = kb.getKeys(['a', 's', 'escape'], waitRelease=False)
+        keys = kb.getKeys(['num_3', '3', '6', 'num_6', 'escape'], waitRelease=False, clear=False)
         
         for key in keys:
             if key.name == 'escape':
                 running = False
-            elif key.name == 'a':
-                magnitude = max(0, magnitude - magnitude_step)
-                probe.setMagnitude(magnitude)
-                probe.setMagnitudePixels(magnitude)
-                print(f"Magnitude: {magnitude}")
-            elif key.name == 's':
-                magnitude += magnitude_step
-                probe.setMagnitude(magnitude)
-                probe.setMagnitudePixels(magnitude)
-                print(f"Magnitude: {magnitude}")
+            elif key.name == 'num_3' or key.name == '3':
+                vertical_position -= vertical_position_step
+                probe.setPos([vertical_position, 0])
+            elif key.name == 'num_6' or key.name == '6':
+                vertical_position += vertical_position_step
+                probe.setPos([vertical_position, 0])
         
         # Update magnitude text
-        magnitude_text.text = f"Magnitude: {magnitude}"
+        magnitude_text.text = f"Vertical Position: {vertical_position}"
         
         # Draw stimuli
-        probe.draw(win=win)
+        probe.draw()
         magnitude_text.draw()
         instructions.draw()
         
