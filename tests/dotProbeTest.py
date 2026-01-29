@@ -1,14 +1,16 @@
-"""Simple test for ShapeOutlineProbe with semiellipse function.
+"""Simple test for dot probe placement task.
 
-Renders a semiellipse probe where magnitude controls the ellipse stretch/compression.
-Adjust magnitude using numpad 3 (decrease) and 6 (increase).
+Renders a dot probe where users control the x position of the dot.
+Adjust x position using numpad 3 (left) and 6 (right).
 Press ESC to exit.
+
+This can be used to measure features such as maximum or minimum depth positions (relative depth)
+
 """
 from __future__ import annotations
 
 import sys
 import pathlib
-import numpy as np
 from psychopy import core, visual
 from psychopy.hardware import keyboard
 
@@ -17,15 +19,6 @@ repo_root = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(repo_root / 'src'))
 
 from threedipa.stimuli.probe2D import DotProbe
-
-
-def parabolaProbe(x: float, magnitude: float) -> float:
-    """
-    Function that controls the stretch/compression of parabola probe.
-    """
-    radius = 50 # in pixels, change with probe length
-    y = (2*np.sqrt(x**2) / radius)**2 * magnitude
-    return y
 
 
 def main():
@@ -64,7 +57,7 @@ def main():
     # Instructions text
     instructions = visual.TextStim(
         win=win,
-        text="Numpad 3: Decrease  |  Numpad 6: Increase  |  ESC: Exit",
+        text="Numpad 3: left  |  Numpad 6: right  |  ESC: Exit",
         pos=(0, 300),
         height=16,
         color=(0.5, 0.5, 0.5),
@@ -79,7 +72,7 @@ def main():
     running = True
     
     print("Starting probe test...")
-    print("Use numpad 3 to decrease magnitude, numpad 6 to increase")
+    print("Use numpad 3 to move dot left, numpad 6 to move dot right")
     print("Press ESC to exit")
     
     while running:
