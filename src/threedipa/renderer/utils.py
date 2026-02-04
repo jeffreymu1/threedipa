@@ -162,7 +162,7 @@ def setup_haploscope_windows(
     return left_window, right_window
 
 def setup_single_window(
-    monitor_name: str = "left",
+    monitor_number: int = 0,
     screen_index: int = 0,
     size_pix: tuple[int, int] = [],
     fullscr: bool = True,
@@ -180,7 +180,7 @@ def setup_single_window(
         size=size_pix,
         screen=screen_index,
         fullscr=fullscr,
-        monitor=monitor_name,
+        monitor=monitor_number,
         color=color,
         waitBlanking=waitBlanking,
         stereo=stereo,

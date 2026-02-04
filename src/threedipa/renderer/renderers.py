@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from . import utils as renderer_utils
 from psychopy import visual
 from threedipa.stimuli.stimuli import make_fixation_cross
+import numpy as np
 
 
 class ExperimentRenderer(ABC):
@@ -129,23 +130,32 @@ class HaplscopeRender2D(ExperimentRenderer):
     def draw_image_stimulus(
         self, stimulus, kwargs: dict = {}
     ):
-        """Draw the image stimulus on the windows."""
+        """Draw the image stimulus on the windows.
+        
+        Supports both numpy arrays and file paths for images.
+        """
         if stimulus.visual_size_degrees is None:
             raise ValueError("Visual size in degrees must be set for the stimulus.")
         stimulus_size_pixels = (
             stimulus.visual_size_degrees[0] * self.pixel_per_degree,
             stimulus.visual_size_degrees[1] * self.pixel_per_degree
         )
+        
+        # Handle numpy arrays vs file paths
+        # If it's a numpy array, pass it directly; otherwise convert to string for file path
+        left_image = stimulus.left_image if isinstance(stimulus.left_image, np.ndarray) else str(stimulus.left_image)
+        right_image = stimulus.right_image if isinstance(stimulus.right_image, np.ndarray) else str(stimulus.right_image)
+        
         stim_left = visual.ImageStim(
             self.windows[0],
-            image=str(stimulus.left_image),
+            image=left_image,
             units="pix",
             size=stimulus_size_pixels,
             **kwargs
         ).draw()
         stim_right = visual.ImageStim(
             self.windows[1],
-            image=str(stimulus.right_image),
+            image=right_image,
             units="pix",
             size=stimulus_size_pixels,
             **kwargs
@@ -290,9 +300,9 @@ class ShutterRenderer3D(ExperimentRenderer):
         self.window = renderer_utils.setup_single_window(
             size_pix=size_pix,
             fullscr=fullscr,
-            monitor=self.config.get("monitor_name", "testMonitor"),
+            monitor_number=0,
             units="pix",
-            color=(-1, -1, -1),  # Black background
+            color=(-1, -1, -1),  # Black background (PsychoPy uses -1 to 1 range)
             waitBlanking=True,
             stereo=True,  # Enable stereo rendering by using quad buffer for shutter glasses
         )
@@ -374,7 +384,10 @@ class ShutterRenderer3D(ExperimentRenderer):
     def draw_image_stimulus(
         self, stimulus, kwargs: dict = {}
     ):
-        """Draw the image stimulus to left and right eyes."""
+        """Draw the image stimulus to left and right eyes.
+        
+        Supports both numpy arrays and file paths for images.
+        """
         if stimulus.visual_size_degrees is None:
             raise ValueError("Visual size in degrees must be set for the stimulus.")
         stimulus_size_pixels = (
@@ -382,11 +395,16 @@ class ShutterRenderer3D(ExperimentRenderer):
             stimulus.visual_size_degrees[1] * self.pixel_per_degree
         )
         
+        # Handle numpy arrays vs file paths
+        # If it's a numpy array, pass it directly; otherwise convert to string for file path
+        left_image = stimulus.left_image if isinstance(stimulus.left_image, np.ndarray) else str(stimulus.left_image)
+        right_image = stimulus.right_image if isinstance(stimulus.right_image, np.ndarray) else str(stimulus.right_image)
+        
         # Draw left image to left eye buffer
         self.window.setBuffer('left')
         visual.ImageStim(
             self.window,
-            image=str(stimulus.left_image),
+            image=left_image,
             units="pix",
             size=stimulus_size_pixels,
             **kwargs
@@ -396,7 +414,7 @@ class ShutterRenderer3D(ExperimentRenderer):
         self.window.setBuffer('right')
         visual.ImageStim(
             self.window,
-            image=str(stimulus.right_image),
+            image=right_image,
             units="pix",
             size=stimulus_size_pixels,
             **kwargs

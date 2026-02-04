@@ -126,14 +126,14 @@ class ShapeOutlineProbe(Probe2D):
         self.magnitude = magnitude
 
 
-class DotStimulus(Probe2D):
-    """Draws 2D dot(s) on the screen"""
+class DotProbe(Probe2D):
+    """Draws 2D a movable dot on the screen. (Can only draw one dot for now)"""
     
     def __init__(self, win, pos=None, size=0.1, color='white', num_dots=1):
         super().__init__(win)
         self.size = size
         self.color = color
-        self.num_dots = num_dots
+        self.num_dots = 1
         self.pos = pos if pos is not None else [0, 0]
         
         if num_dots == 1:
