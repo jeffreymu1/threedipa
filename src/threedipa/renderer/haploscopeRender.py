@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from . import utils as renderer_utils
 from psychopy import visual
 from threedipa.stimuli.stimuli import make_fixation_cross
+import numpy as np
 
 
 class HaplscopeRender(ABC):
@@ -130,23 +131,32 @@ class HaplscopeRender2D(HaplscopeRender):
     def draw_image_stimulus(
         self, stimulus, kwargs: dict = {}
     ):
-        """Draw the image stimulus on the windows."""
+        """Draw the image stimulus on the windows.
+        
+        Supports both numpy arrays and file paths for images.
+        """
         if stimulus.visual_size_degrees is None:
             raise ValueError("Visual size in degrees must be set for the stimulus.")
         stimulus_size_pixels = (
             stimulus.visual_size_degrees[0] * self.pixel_per_degree,
             stimulus.visual_size_degrees[1] * self.pixel_per_degree
         )
+        
+        # Handle numpy arrays vs file paths
+        # If it's a numpy array, pass it directly; otherwise convert to string for file path
+        left_image = stimulus.left_image if isinstance(stimulus.left_image, np.ndarray) else str(stimulus.left_image)
+        right_image = stimulus.right_image if isinstance(stimulus.right_image, np.ndarray) else str(stimulus.right_image)
+        
         stim_left = visual.ImageStim(
             self.windows[0],
-            image=str(stimulus.left_image),
+            image=left_image,
             units="pix",
             size=stimulus_size_pixels,
             **kwargs
         ).draw()
         stim_right = visual.ImageStim(
             self.windows[1],
-            image=str(stimulus.right_image),
+            image=right_image,
             units="pix",
             size=stimulus_size_pixels,
             **kwargs
