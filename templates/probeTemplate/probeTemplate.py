@@ -145,7 +145,7 @@ def main():
     kb.waitKeys(keyList=['return', ], waitRelease=True)
     
     # 9. Give instructions to the participant
-    instructions_text = ("Press 3 if the stimulus is stretched and 6 if it is squashed."
+    instructions_text = ("Press 3 to stretch the probe and 6 to compress it."
     + "\nPress enter to begin the experiment.")
     renderer.draw_text(instructions_text, pos=(0, 0))
     renderer.render_screen()
@@ -180,17 +180,17 @@ def main():
             stimulusAdjustmentDraw(renderer, stimulus, probe, phaseTracker.get_stimulus_phase())
 
             if phaseTracker.get_response_phase() == utils.ResponsePhase.WAIT_FOR_RESPONSE:
-                response_keys = kb.getKeys(['a', 's', 'escape', 'return'], waitRelease=False)
+                response_keys = kb.getKeys(['num_3', '3', 'num_6', '6', 'escape', 'return'], waitRelease=False, clear=False)
         
                 if response_keys:
                     key = response_keys.pop()
                     if key.name == 'escape':
                         exit_experiment(phaseTracker)
                         break
-                    elif key.name == 'a':
+                    elif key.name == 'num_3' or key.name == '3':
                         magnitude = max(0, magnitude - magnitude_step)
                         probe.setMagnitude(magnitude)
-                    elif key.name == 's':
+                    elif key.name == 'num_6' or key.name == '6':
                         magnitude += magnitude_step
                         probe.setMagnitude(magnitude)
                     elif key == 'return':
