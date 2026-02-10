@@ -14,11 +14,11 @@ def main():
     # Create simple test images as numpy arrays
     # Left image: red square
     left_image_array = np.zeros((200, 200, 3), dtype=np.uint8)
-    left_image_array[:, :, 0] = 255  # Red channel
+    left_image_array[:, :, 0] = 1.0  # Red channel
     
     # Right image: blue square
     right_image_array = np.zeros((200, 200, 3), dtype=np.uint8)
-    right_image_array[:, :, 2] = 255  # Blue channel
+    right_image_array[:, :, 2] = 1.0  # Blue channel
     
     # Create stimulus object with paths set to None
     stimulus = Stimulus2DImage(
