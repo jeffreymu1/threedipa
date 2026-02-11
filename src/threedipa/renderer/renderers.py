@@ -271,10 +271,9 @@ class HaplscopeRender3D(ExperimentRenderer):
 
 
 class ShutterRenderer3D(ExperimentRenderer):
-    """Render the stimulus using quad buffer stereo with shutter glasses.
-    
-    This class uses a single window with quad buffer stereo mode to render
-    separate images to the left and right eye using shutter glasses synchronization.
+    """
+    Frame-sequential stereo renderer (software stereo).
+    Alternates left/right image every frame.
     """
 
     def __init__(
@@ -292,172 +291,154 @@ class ShutterRenderer3D(ExperimentRenderer):
         self.config = screen_config
         self.debug_mode = debug_mode
         self.fixation_cross_degrees = fixation_cross_degrees
-        
-        # Create a single window with quad buffer stereo mode for shutter glasses
+
         size_pix = self.config["size_pix"] if not self.debug_mode else [800, 600]
         fullscr = self.config["full_screen"] if not self.debug_mode else False
-        
+
         self.window = renderer_utils.setup_single_window(
             size_pix=size_pix,
             fullscr=fullscr,
             monitor_number=0,
             units="pix",
-            color=(-1, -1, -1),  # Black background (PsychoPy uses -1 to 1 range)
+            color=(-1, -1, -1),
             waitBlanking=True,
-            stereo=True,  # Enable stereo rendering by using quad buffer for shutter glasses
+            stereo=False,  
         )
-        
-        self.pixel_by_cm_density = self.config["size_pix"][0] / self.config["size_cm"][0]
+
+        self.pixel_by_cm_density = (
+            self.config["size_pix"][0] / self.config["size_cm"][0]
+        )
 
         self.pixel_per_degree = utils.pixels_by_visual_degree(
             self.config["size_cm"][0],
             self.fixation_distance,
-            self.pixel_by_cm_density
+            self.pixel_by_cm_density,
         )
 
+        self.frame_index = 0
+
+
     def draw_physical_calibration(self):
-        """Draw the physical calibration on the window in mm."""
-        calibration_text = "Ensure monitor is moved to the correct position.\n Press Enter to continue"
-        
-        # Draw to both eyes
-        for eye in ['left', 'right']:
-            self.window.setBuffer(eye)
-            visual.TextStim(
-                self.window,
-                text=calibration_text,
-                units=self.window.units,
-                pos=(0, 0),
-                color='white'
-            ).draw()
+        calibration_text = (
+            "Ensure monitor is moved to the correct position.\n Press Enter to continue"
+        )
+
+        visual.TextStim(
+            self.window,
+            text=calibration_text,
+            units=self.window.units,
+            pos=(0, 0),
+            color="white",
+        ).draw()
 
     def draw_text(self, text: str, pos: tuple[float, float] = (0, 0)):
-        """Draw text to both eyes."""
-        for eye in ['left', 'right']:
-            self.window.setBuffer(eye)
-            visual.TextStim(
-                self.window,
-                text=text,
-                units=self.window.units,
-                pos=pos,
-                color='white'
-            ).draw()
+        visual.TextStim(
+            self.window,
+            text=text,
+            units=self.window.units,
+            pos=pos,
+            color="white",
+        ).draw()
 
     def draw_fixation_cross(
         self,
-        size_degrees: tuple[float, float] = [],
-        color: str = 'white',
-        pos : tuple[float, float] = (0, 0)
+        size_degrees: tuple[float, float] = None,
+        color: str = "white",
+        pos: tuple[float, float] = (0, 0),
     ):
-        """Draw the fixation cross on both eyes."""
-        if size_degrees == []:
-            size_degrees = (self.fixation_cross_degrees, self.fixation_cross_degrees)
-        horizontal_in_pixels = size_degrees[0] * self.pixel_per_degree
-        vertical_in_pixels = size_degrees[1] * self.pixel_per_degree
-
-        size_pixels = (horizontal_in_pixels, vertical_in_pixels)
-        
-        # Draw to both eyes
-        for eye in ['left', 'right']:
-            self.window.setBuffer(eye)
-            # Create vertical line
-            vertical = visual.Line(
-                win=self.window,
-                start=(0, -size_pixels[1]/2),
-                end=(0, size_pixels[1]/2),
-                units="pix",
-                pos=pos,
-                color=color
+        if size_degrees is None:
+            size_degrees = (
+                self.fixation_cross_degrees,
+                self.fixation_cross_degrees,
             )
-            # Create horizontal line
-            horizontal = visual.Line(
-                win=self.window,
-                start=(-size_pixels[0]/2, 0),
-                end=(size_pixels[0]/2, 0),
-                units="pix",
-                pos=pos,
-                color=color
-            )
-            # Draw fixation cross
-            vertical.draw()
-            horizontal.draw()
 
-    def draw_image_stimulus(
-        self, stimulus, kwargs: dict = {}
-    ):
-        """Draw the image stimulus to left and right eyes.
-        
-        Supports both numpy arrays and file paths for images.
-        """
+        horizontal = size_degrees[0] * self.pixel_per_degree
+        vertical = size_degrees[1] * self.pixel_per_degree
+
+        vertical_line = visual.Line(
+            win=self.window,
+            start=(0, -vertical / 2),
+            end=(0, vertical / 2),
+            units="pix",
+            pos=pos,
+            color=color,
+        )
+
+        horizontal_line = visual.Line(
+            win=self.window,
+            start=(-horizontal / 2, 0),
+            end=(horizontal / 2, 0),
+            units="pix",
+            pos=pos,
+            color=color,
+        )
+
+        vertical_line.draw()
+        horizontal_line.draw()
+
+
+    def draw_image_stimulus(self, stimulus, kwargs: dict = {}):
         if stimulus.visual_size_degrees is None:
-            raise ValueError("Visual size in degrees must be set for the stimulus.")
+            raise ValueError("Visual size in degrees must be set.")
+
         stimulus_size_pixels = (
             stimulus.visual_size_degrees[0] * self.pixel_per_degree,
-            stimulus.visual_size_degrees[1] * self.pixel_per_degree
+            stimulus.visual_size_degrees[1] * self.pixel_per_degree,
         )
-        
-        # Handle numpy arrays vs file paths
-        # If it's a numpy array, pass it directly; otherwise convert to string for file path
-        left_image = stimulus.left_image if isinstance(stimulus.left_image, np.ndarray) else str(stimulus.left_image)
-        right_image = stimulus.right_image if isinstance(stimulus.right_image, np.ndarray) else str(stimulus.right_image)
-        
-        # Draw left image to left eye buffer
-        self.window.setBuffer('left')
-        visual.ImageStim(
-            self.window,
-            image=left_image,
-            units="pix",
-            size=stimulus_size_pixels,
-            **kwargs
-        ).draw()
-        
-        # Draw right image to right eye buffer
-        self.window.setBuffer('right')
-        visual.ImageStim(
-            self.window,
-            image=right_image,
-            units="pix",
-            size=stimulus_size_pixels,
-            **kwargs
-        ).draw()
-    
-    def convert_visual_angle_to_pixels(self, angle):
-        """Convert visual angle in degrees to pixels on the screen."""
-        return self.pixel_per_degree * angle
-    
-    def convert_centimeters_to_pixels(self, size_cm):
-        """Convert physical size to pixels on the screen."""
-        size_degrees = utils.degree_from_width_cm(size_cm, self.fixation_distance)
-        return self.convert_visual_angle_to_pixels(size_degrees)
 
-    def draw_probe(
-        self, probe_stimulus
-    ):
-        """Draw the probe stimulus to both eyes."""
-        # Update the amount of pixel movement.
+        left_image = (
+            stimulus.left_image
+            if isinstance(stimulus.left_image, np.ndarray)
+            else str(stimulus.left_image)
+        )
+
+        right_image = (
+            stimulus.right_image
+            if isinstance(stimulus.right_image, np.ndarray)
+            else str(stimulus.right_image)
+        )
+
+        if self.frame_index % 2 == 0:
+            image = left_image
+        else:
+            image = right_image
+
+        visual.ImageStim(
+            self.window,
+            image=image,
+            units="pix",
+            size=stimulus_size_pixels,
+            **kwargs,
+        ).draw()
+
+        self.frame_index += 1
+
+
+    def draw_probe(self, probe_stimulus):
         magnitude = probe_stimulus.getMagnitude()
+
         if probe_stimulus.units == "centimeters":
             magnitude_pixels = self.convert_centimeters_to_pixels(magnitude)
-            probe_stimulus.setMagnitudePixels(magnitude_pixels)
         elif probe_stimulus.units == "degrees":
             magnitude_pixels = self.convert_visual_angle_to_pixels(magnitude)
-            probe_stimulus.setMagnitudePixels(magnitude_pixels)
-        elif probe_stimulus.units == "pixels":
+        else:
             magnitude_pixels = magnitude
-            probe_stimulus.setMagnitudePixels(magnitude_pixels)
-        
-        # Draw to both eyes
-        for eye in ['left', 'right']:
-            self.window.setBuffer(eye)
-            probe_stimulus.draw(self.window)
 
-    def render_screen(
-        self
-    ):
-        """Render the screen - flip() handles shutter synchronization automatically."""
+        probe_stimulus.setMagnitudePixels(magnitude_pixels)
+        probe_stimulus.draw(self.window)
+
+
+    def convert_visual_angle_to_pixels(self, angle):
+        return self.pixel_per_degree * angle
+
+    def convert_centimeters_to_pixels(self, size_cm):
+        size_degrees = utils.degree_from_width_cm(
+            size_cm, self.fixation_distance
+        )
+        return self.convert_visual_angle_to_pixels(size_degrees)
+
+    def render_screen(self):
         self.window.flip()
 
     def close_windows(self):
-        """Close the window."""
         self.window.close()
-
-

@@ -52,7 +52,7 @@ def main():
     print("Rendering stimulus with shutter glasses for 10 seconds...")
     print("Press ESC to exit early")
     
-    while clock.getTime() < 10.0:
+    while clock.getTime() < 180.0:
         renderer.draw_image_stimulus(stimulus)
         renderer.render_screen()
         
