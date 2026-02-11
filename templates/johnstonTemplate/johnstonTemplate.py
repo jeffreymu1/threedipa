@@ -41,11 +41,31 @@ def load_stimulus(
     exp_dir: str
 ) -> Stimulus2DImage:
     # Load the stimulus from the stimulus library
-    stimulus = Stimulus2DImage(
-        left_image_path=exp_dir+'stimuli/10_L.png',
-        right_image_path=exp_dir+'stimuli/10_R.png'
-    )
-    return stimulus
+    # stimulus = Stimulus2DImage(
+    #     left_image_path=exp_dir+'stimuli/10_L.png',
+    #     right_image_path=exp_dir+'stimuli/10_R.png'
+    # )
+    # return stimulus
+
+    stim_dir = os.path.join(exp_dir, 'stimuli')
+    files = os.listdir(stim_dir)
+
+    pairs = []
+
+
+    png_files = [f for f in files if f.endswith('.png')]
+
+
+    grouped = {}
+    for f in png_files:
+        key = f.rsplit('_', 1)[0]  
+        grouped.setdefault(key, {})[f.split('_')[-1].split('.')[0]] = f
+
+    for key, sides in grouped.items():
+        if 'left' in sides and 'right' in sides:
+            pairs.append((sides['left'], sides['right']))
+
+    print(pairs)
 
 def reset_phase_tracker(phaseTracker: utils.PhaseTracker):
     phaseTracker.set_experiment_phase(utils.ExperimentPhase.PRE_TRIAL)
